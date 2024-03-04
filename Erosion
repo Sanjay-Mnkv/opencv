@@ -1,0 +1,10 @@
+#!/bin/python3
+import cv2
+import numpy as np
+
+img = cv2.imread('chess.png',0)
+kernel = np.ones((3,3),np.uint8)
+erosion = cv2.erode(img,kernel)
+img=np.hstack((img,erosion))
+cv2.imshow('dst',img)
+cv2.waitKey(0)
