@@ -1,0 +1,49 @@
+#!/bin/python3
+from sklearn.metrics import accuracy_score
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score, confusion_matrix, ConfusionMatrixDisplay
+liver=pd.read_csv('/home/sw900b2_sanjay/Downloads/archive/indian_liver_patient.csv')
+liver.isnull().sum()
+liver[liver['Albumin_and_Globulin_Ratio'].isnull()]
+liver["Albumin_and_Globulin_Ratio"] = liver.Albumin_and_Globulin_Ratio.fillna(liver['Albumin_and_Globulin_Ratio'].mean())
+liver.isnull().sum()
+liver['Dataset'].value_counts()
+pd.get_dummies(liver['Gender'], prefix = 'Gender').head()
+sns.countplot(data=liver, x = 'Dataset', label='Count')
+plt.show()
+
+
+LD, NLD = liver['Dataset'].value_counts()
+print('Number of patients diagnosed with liver disease: ',LD)
+print('Number of patients not diagnosed with liver disease: ',NLD)
+X=liver.drop(['Gender','Dataset'],axis=1)
+y=liver['Dataset']
+liver_corr = X.corr()
+liver_corr
+plt.figure(figsize=(30, 30))
+sns.heatmap(liver_corr, cbar = True,  square = True, annot=True, fmt= '.2f',annot_kws={'size': 15},cmap= 'coolwarm')
+plt.show()
+plt.title('Correlation between features');
+X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3)
+classifier=LogisticRegression(solver='liblinear')
+classifier.fit(X_train,y_train)
+y_test_prediction=classifier.predict(X_test)
+y_test_prediction
+print(accuracy_score(y_test,y_test_prediction))
+y_train_prediction=classifier.predict(X_train)
+print(accuracy_score(y_train,y_train_prediction))
+conf_mat=confusion_matrix(y_test,y_test_prediction)
+print(conf_mat)
+plt.figure(figsize=(12,6))
+sns.heatmap(conf_mat,annot=True,fmt='d')
+plt.title("Confusion Matrix of test data")
+plt.xlabel("Predicted value")
+plt.ylabel("Actual value")
+plt.show()
+from sklearn.metrics import classification_report
+print(classification_report(y_test,y_test_prediction))
